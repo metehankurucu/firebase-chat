@@ -1,5 +1,5 @@
 import firebase from "firebase";
-import { RoomsConfig } from "./interfaces/rooms";
+import { Room, RoomsConfig } from "./interfaces/rooms";
 
 class Rooms {
   private config: RoomsConfig;
@@ -52,11 +52,14 @@ class Rooms {
 
     if (!otherUserId) return;
 
-    await this.collection().doc(`${userId}-${otherUserId}`).set({
+    const roomData: Room = {
       user1Id: userId,
       user2Id: otherUserId,
-      lastMessage: null,
-    });
+      lastMessage: "",
+      lastSenderId: "",
+    };
+
+    await this.collection().doc(`${userId}-${otherUserId}`).set(roomData);
   };
 }
 

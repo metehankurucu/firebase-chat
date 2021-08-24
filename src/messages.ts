@@ -1,5 +1,6 @@
 import firebase from "firebase";
 import { Message, MessagesConfig } from "./interfaces/messages";
+import { Room } from "./interfaces/rooms";
 
 class Messages {
   private config: MessagesConfig;
@@ -10,9 +11,10 @@ class Messages {
     this.db = firebase.firestore();
   }
 
-  collection = () => {
-    return this.db.collection(`${this.config.collectionPrefix}messages`);
+  collection = (collection = "messages") => {
+    return this.db.collection(`${this.config.collectionPrefix}${collection}`);
   };
+
   sendMessage = async (message: string, mediaURL?: string) => {
     const { roomId, userId } = this.config;
     const messageData: Message = {
@@ -25,6 +27,14 @@ class Messages {
     if (mediaURL) messageData.mediaURL = mediaURL;
 
     const data = await this.collection().add(messageData);
+
+    const roomData: Partial<Room> = {
+      lastMessage: message || "Media",
+      lastSenderId: userId,
+    };
+
+    await this.collection("rooms").doc(roomId).update(roomData);
+
     return (await data.get()).data();
   };
 
