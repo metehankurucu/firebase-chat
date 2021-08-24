@@ -1,7 +1,7 @@
 {
   "name": "firebasechat",
   "version": "1.0.0",
-  "description": "",
+  "description": "A small library for one-to-one messaging with Firebase.",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "scripts": {
@@ -12,7 +12,12 @@
     "lint": "eslint src --ext .js,.jsx,.ts,.tsx",
     "prepublish": "tsc"
   },
-  "keywords": [],
+  "keywords": [
+    "chat",
+    "firebase",
+    "messaging",
+    "firebase-chat"
+  ],
   "author": "Metehan Kurucu <metehankurucu@gmail.com>",
   "license": "MIT",
   "devDependencies": {
