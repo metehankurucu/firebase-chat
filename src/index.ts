@@ -18,7 +18,7 @@ class FirebaseChat {
     firebaseConfig?: object | undefined
   ) => {
     if (firebaseConfig) firebase.initializeApp(firebaseConfig);
-    FirebaseChat.options = { ...options, ...defaultOptions };
+    FirebaseChat.options = { ...defaultOptions, ...options };
     return FirebaseChat;
   };
 

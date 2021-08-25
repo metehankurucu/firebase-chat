@@ -17,17 +17,15 @@ class Rooms {
   getRooms = async () => {
     const { userId } = this.config;
     const rooms: firebase.firestore.DocumentData[] = [];
-    const user1Rooms = await this.db
-      .collection("rooms")
+    const user1Rooms = await this.collection()
       .where("user1Id", "==", userId)
       .get();
-    const user2Rooms = await this.db
-      .collection("rooms")
+    const user2Rooms = await this.collection()
       .where("user2Id", "==", userId)
       .get();
     //TODO: sort by last message date
-    user1Rooms.forEach((item) => rooms.push(item.data()));
-    user2Rooms.forEach((item) => rooms.push(item.data()));
+    user1Rooms.forEach((item) => rooms.push({ id: item.id, ...item.data() }));
+    user2Rooms.forEach((item) => rooms.push({ id: item.id, ...item.data() }));
     return rooms;
   };
 
@@ -48,9 +46,12 @@ class Rooms {
   };
 
   createRoom = async (otherUserId: string) => {
-    const { userId } = this.config;
-
     if (!otherUserId) return;
+
+    const hasRoom = await this.getRoom(otherUserId);
+    if (hasRoom) return;
+
+    const { userId } = this.config;
 
     const roomData: Room = {
       user1Id: userId,
@@ -60,6 +61,19 @@ class Rooms {
     };
 
     await this.collection().doc(`${userId}-${otherUserId}`).set(roomData);
+  };
+
+  deleteRoom = async (roomId: string) => {
+    await this.collection().doc(roomId).delete();
+  };
+
+  deleteAllRooms = async () => {
+    const { userId } = this.config;
+    const rooms = await this.getRooms();
+
+    rooms.forEach(
+      async (item) => await this.collection().doc(item.id).delete()
+    );
   };
 }
 

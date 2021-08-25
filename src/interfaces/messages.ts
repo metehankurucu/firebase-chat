@@ -7,6 +7,7 @@ export interface Message {
   receiverId?: string;
   mediaURL?: string;
   date: number;
+  read?: boolean;
 }
 
 export interface MessagesConfig extends FirebaseChatOptions {
