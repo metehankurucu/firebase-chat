@@ -1,3 +1,4 @@
+import { Message } from "./messages";
 import { FirebaseChatOptions } from "./options";
 
 export interface RoomsConfig extends FirebaseChatOptions {
@@ -5,8 +6,9 @@ export interface RoomsConfig extends FirebaseChatOptions {
 }
 
 export interface Room {
+  id?: string;
   user1Id: string;
   user2Id: string;
-  lastMessage: string;
-  lastSenderId: string;
+  lastMessage: Message | null;
+  updatedAt: number;
 }

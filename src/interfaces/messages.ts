@@ -1,6 +1,7 @@
 import { FirebaseChatOptions } from "./options";
 
 export interface Message {
+  id?: string;
   roomId: string;
   message: string;
   senderId: string;

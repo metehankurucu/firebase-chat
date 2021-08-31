@@ -34,8 +34,8 @@ class Messages {
     const data = await (await this.collection().add(messageData)).get();
 
     const roomData: Partial<Room> = {
-      lastMessage: message || "Media",
-      lastSenderId: userId,
+      lastMessage: messageData,
+      updatedAt: Date.now(),
     };
 
     await this.collection("rooms").doc(roomId).update(roomData);
@@ -80,10 +80,26 @@ class Messages {
       .where("senderId", "!=", userId)
       .get();
 
-    data.docs.forEach(
-      async (item) =>
-        await this.collection().doc(item.id).update({ read: true })
+    const promises = data.docs.map((item) =>
+      this.collection().doc(item.id).update({ read: true })
     );
+
+    await Promise.all(promises);
+  };
+
+  listenMessages = (callback: (messages: Message[]) => void, limit = 50) => {
+    const { roomId } = this.config;
+    return this.collection()
+      .where("roomId", "==", roomId)
+      .orderBy("date", "desc")
+      .limit(limit)
+      .onSnapshot((snapshot) => {
+        const items: Message[] = [];
+        snapshot.forEach((item) =>
+          items.push({ id: item.id, ...(item.data() as Message) })
+        );
+        callback(items);
+      });
   };
 }
 
