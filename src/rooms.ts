@@ -112,7 +112,12 @@ class Rooms {
       callback(this.sortRooms([...user1Rooms, ...user2Rooms]));
     });
 
-    return [user1Snapshot, user2Snapshot];
+    const unsubscribe = () => {
+      user1Snapshot();
+      user2Snapshot();
+    };
+
+    return unsubscribe;
   };
 
   private sortRooms = (rooms: Room[]) => {
