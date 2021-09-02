@@ -80,7 +80,7 @@ class Rooms {
     );
   };
 
-  listenRooms = async (callback: (rooms: Room[]) => void) => {
+  listenRooms = (callback: (rooms: Room[]) => void) => {
     const { userId } = this.config;
 
     const user1RoomsQuery = this.collection().where("user1Id", "==", userId);
