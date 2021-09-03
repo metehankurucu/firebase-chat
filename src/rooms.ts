@@ -1,5 +1,5 @@
 import firebase from "firebase";
-import { Room, RoomsConfig } from "./interfaces/rooms";
+import { Room, RoomsConfig, GetRoomOptions } from "./interfaces/rooms";
 
 class Rooms {
   private config: RoomsConfig;
@@ -34,7 +34,19 @@ class Rooms {
     return this.sortRooms(rooms);
   };
 
-  getRoom = async (otherUserId: string) => {
+  getRoom = async (
+    otherUserId: string,
+    options: GetRoomOptions = {
+      createIfNotExists: false,
+    }
+  ) => {
+    const room = await this.findRoom(otherUserId);
+    if (room) return room;
+    if (options?.createIfNotExists) return await this.createRoom(otherUserId);
+    return null;
+  };
+
+  findRoom = async (otherUserId: string) => {
     const { userId } = this.config;
 
     const room1 = await this.getRoomByUsers(userId, otherUserId);
@@ -51,10 +63,7 @@ class Rooms {
   };
 
   createRoom = async (otherUserId: string) => {
-    if (!otherUserId) return;
-
-    const hasRoom = await this.getRoom(otherUserId);
-    if (hasRoom) return;
+    if (!otherUserId) return null;
 
     const { userId } = this.config;
 
@@ -66,6 +75,8 @@ class Rooms {
     };
 
     await this.collection().doc(`${userId}-${otherUserId}`).set(roomData);
+
+    return await this.findRoom(otherUserId);
   };
 
   deleteRoom = async (roomId: string) => {

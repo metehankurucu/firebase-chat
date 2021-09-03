@@ -12,3 +12,7 @@ export interface Room {
   lastMessage: Message | null;
   updatedAt: number;
 }
+
+export interface GetRoomOptions {
+  createIfNotExists: boolean;
+}
