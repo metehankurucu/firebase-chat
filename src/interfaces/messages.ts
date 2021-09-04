@@ -15,3 +15,8 @@ export interface MessagesConfig extends FirebaseChatOptions {
   userId: string;
   roomId: string;
 }
+
+export interface GetMessagesOptions {
+  limit: number;
+  startAfter?: number;
+}

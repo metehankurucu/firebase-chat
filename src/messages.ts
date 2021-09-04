@@ -1,6 +1,14 @@
 import firebase from "firebase";
-import { Message, MessagesConfig } from "./interfaces/messages";
+import {
+  GetMessagesOptions,
+  Message,
+  MessagesConfig,
+} from "./interfaces/messages";
 import { Room } from "./interfaces/rooms";
+
+const defaultGetMessagesOptions: GetMessagesOptions = {
+  limit: 100,
+};
 
 class Messages {
   private config: MessagesConfig;
@@ -43,15 +51,26 @@ class Messages {
     return { id: data.id, ...data.data() };
   };
 
-  getMessages = async (limit: number = 100) => {
+  getMessages = async (
+    options?: Partial<GetMessagesOptions>
+  ): Promise<Message[]> => {
+    const config = { ...defaultGetMessagesOptions, ...(options ?? {}) };
     const { roomId } = this.config;
-    const messages: firebase.firestore.DocumentData[] = [];
-    const data = await this.collection()
+    const messages: Message[] = [];
+
+    let query = this.collection()
       .where("roomId", "==", roomId)
-      .orderBy("date", "desc")
-      .limit(limit)
-      .get();
-    data.forEach((item) => messages.push({ id: item.id, ...item.data() }));
+      .orderBy("date", "asc");
+
+    if (config.startAfter) query = query.startAfter(config.startAfter);
+
+    if (config.limit) query = query.limit(config.limit);
+
+    const data = await query.get();
+
+    data.forEach((item) =>
+      messages.push({ id: item.id, ...(item.data() as Message) })
+    );
     return messages;
   };
 
@@ -87,19 +106,28 @@ class Messages {
     await Promise.all(promises);
   };
 
-  listenMessages = (callback: (messages: Message[]) => void, limit = 50) => {
+  listenMessages = (
+    options: Partial<GetMessagesOptions>,
+    callback: (messages: Message[]) => void
+  ) => {
+    const config = { ...defaultGetMessagesOptions, ...(options ?? {}) };
     const { roomId } = this.config;
-    return this.collection()
+
+    let query = this.collection()
       .where("roomId", "==", roomId)
-      .orderBy("date", "desc")
-      .limit(limit)
-      .onSnapshot((snapshot) => {
-        const items: Message[] = [];
-        snapshot.forEach((item) =>
-          items.push({ id: item.id, ...(item.data() as Message) })
-        );
-        callback(items);
-      });
+      .orderBy("date", "asc");
+
+    if (config.startAfter) query = query.startAfter(config.startAfter);
+
+    if (config.limit) query = query.limit(config.limit);
+
+    return query.onSnapshot((snapshot) => {
+      const items: Message[] = [];
+      snapshot.forEach((item) =>
+        items.push({ id: item.id, ...(item.data() as Message) })
+      );
+      callback(items);
+    });
   };
 }
 
