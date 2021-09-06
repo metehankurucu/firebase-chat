@@ -13,10 +13,12 @@ const defaultGetMessagesOptions: GetMessagesOptions = {
 class Messages {
   private config: MessagesConfig;
   private db: firebase.firestore.Firestore;
+  private otherUserId: string;
 
   constructor(config: MessagesConfig) {
     this.config = config;
     this.db = firebase.firestore();
+    this.otherUserId = this.getOtherUserId();
   }
 
   collection = (collection = "messages") => {
@@ -28,11 +30,19 @@ class Messages {
   };
 
   sendMessage = async (message: string, mediaURL?: string) => {
+    if (!message && !mediaURL) {
+      console.warn(
+        "Message could not sent. `message` and `mediaURL` did not provided for sendMessage(message: string, mediaURL?: string)"
+      );
+      return null;
+    }
+
     const { roomId, userId } = this.config;
     const messageData: Message = {
       roomId,
-      senderId: userId,
       message,
+      senderId: userId,
+      receiverId: this.otherUserId,
       date: Date.now(),
       read: false,
     };
@@ -128,6 +138,18 @@ class Messages {
       );
       callback(items);
     });
+  };
+
+  getOtherUserId = () => {
+    const splittedRoomId = this.config.roomId.split("-");
+    if (splittedRoomId.length !== 2) {
+      throw new Error(
+        `Invalid roomId provided in Messages '${this.config.roomId}'`
+      );
+    }
+    return splittedRoomId[0] === this.config.userId
+      ? splittedRoomId[1]
+      : splittedRoomId[0];
   };
 }
 
