@@ -70,7 +70,7 @@ class Messages {
 
     let query = this.collection()
       .where("roomId", "==", roomId)
-      .orderBy("date", "asc");
+      .orderBy("date", "desc");
 
     if (config.startAfter) query = query.startAfter(config.startAfter);
 
@@ -125,7 +125,7 @@ class Messages {
 
     let query = this.collection()
       .where("roomId", "==", roomId)
-      .orderBy("date", "asc");
+      .orderBy("date", "desc");
 
     if (config.startAfter) query = query.startAfter(config.startAfter);
 
