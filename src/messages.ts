@@ -144,7 +144,7 @@ class Messages {
     const splittedRoomId = this.config.roomId.split("-");
     if (splittedRoomId.length !== 2) {
       throw new Error(
-        `Invalid roomId provided in Messages '${this.config.roomId}'`
+        `Invalid roomId format provided in Messages '${this.config.roomId}'`
       );
     }
     return splittedRoomId[0] === this.config.userId
