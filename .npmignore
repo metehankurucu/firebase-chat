@@ -3,3 +3,6 @@ examples
 example
 tsconfig.json
 todo.*
+jest.config.json
+tests
+.env
