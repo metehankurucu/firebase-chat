@@ -1,4 +1,6 @@
 const FirebaseChat = require("../dist").default;
+const Rooms = require("../dist/rooms").default;
+const Messages = require("../dist/messages").default;
 const firebaseConfig = require("./firebase-config");
 
 const _firebaseChat = FirebaseChat;
@@ -29,7 +31,7 @@ test("should return itself after setUser", () => {
 
 test("should return rooms class", () => {
   _firebaseChat.initialize({}).setUser("test");
-  expect(_firebaseChat.rooms()).toBeTruthy();
+  expect(_firebaseChat.rooms()).toBeInstanceOf(Rooms);
 });
 
 test("should throw error when called messages with invalid room id", () => {
@@ -42,5 +44,5 @@ test("should return messages class with correct room id", async () => {
   const room = await _firebaseChat
     .rooms()
     .getRoom("otherUser", { createIfNotExists: true });
-  expect(_firebaseChat.messages(room.id)).toBeTruthy();
+  expect(_firebaseChat.messages(room.id)).toBeInstanceOf(Messages);
 });

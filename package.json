@@ -5,7 +5,10 @@
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "scripts": {
+    "pretest": "npm run build",
     "test": "jest --detectOpenHandles",
+    "pretest:dev": "npm run build",
+    "test:dev": "jest --detectOpenHandles --watch",
     "build": "tsc",
     "dev": "nodemon",
     "start": "node dist/index",
