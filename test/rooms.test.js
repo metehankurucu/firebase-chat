@@ -4,11 +4,12 @@ const firebaseConfig = require("./firebase-config");
 const firebase = require("firebase").default;
 
 const otherUser = "test-other-user";
+const currentUser = "test";
 
 const _firebaseChat = FirebaseChat;
 
 beforeAll(() => {
-  _firebaseChat.initialize({}, firebaseConfig).setUser("test");
+  _firebaseChat.initialize({}, firebaseConfig).setUser(currentUser);
 });
 
 test("should return rooms class", () => {
@@ -37,7 +38,7 @@ test("should get room with other user", async () => {
   room = await _firebaseChat
     .rooms()
     .getRoom(otherUser, { createIfNotExists: true });
-  expect(room).toBeInstanceOf(firebase.firestore.DocumentSnapshot);
+  expect(room.id).toBeTruthy();
 });
 
 test("should find room with other user", async () => {
@@ -46,12 +47,12 @@ test("should find room with other user", async () => {
   expect(room).toBeNull();
   await _firebaseChat.rooms().createRoom(otherUser);
   room = await _firebaseChat.rooms().findRoom(otherUser);
-  expect(room).toBeInstanceOf(firebase.firestore.DocumentSnapshot);
+  expect(room.id).toBeTruthy();
 });
 
 test("should create room", async () => {
   const room = await _firebaseChat.rooms().createRoom(otherUser);
-  expect(room).toBeInstanceOf(firebase.firestore.DocumentSnapshot);
+  expect(room.id).toBeTruthy();
 });
 
 test("should not create room without other user id", async () => {
