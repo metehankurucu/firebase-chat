@@ -1,3 +1,4 @@
+import { generateRoomId } from "./utils/room.utils";
 import firebase from "firebase";
 import { Room, RoomsConfig, GetRoomOptions } from "./interfaces/rooms";
 
@@ -14,7 +15,7 @@ class Rooms {
     return this.db.collection(`${this.config.collectionPrefix}rooms`);
   };
 
-  getRooms = async () => {
+  getRooms = async (): Promise<Room[]> => {
     const { userId } = this.config;
     const rooms: Room[] = [];
     const user1Rooms = await this.collection()
@@ -39,32 +40,32 @@ class Rooms {
     options: GetRoomOptions = {
       createIfNotExists: false,
     }
-  ) => {
+  ): Promise<Room | null> => {
     const room = await this.findRoom(otherUserId);
     if (room) return room;
     if (options?.createIfNotExists) return await this.createRoom(otherUserId);
     return null;
   };
 
-  findRoom = async (otherUserId: string) => {
+  findRoom = async (otherUserId: string): Promise<Room | null> => {
     const { userId } = this.config;
 
     const room1 = await this.getRoomByUsers(userId, otherUserId);
-    if (room1.exists) return room1;
+    if (room1.exists) return { id: room1.id, ...(room1.data() as Room) };
 
     const room2 = await this.getRoomByUsers(otherUserId, userId);
-    if (room2.exists) return room2;
+    if (room2.exists) return { id: room2.id, ...(room2.data() as Room) };
 
     return null;
   };
 
   private getRoomByUsers = async (user1Id: string, user2Id: string) => {
-    return await this.collection().doc(`${user1Id}-${user2Id}`).get();
+    const roomId = generateRoomId(user1Id, user2Id) || "";
+    return await this.collection().doc(roomId).get();
   };
 
-  createRoom = async (otherUserId: string) => {
+  createRoom = async (otherUserId: string): Promise<Room | null> => {
     if (!otherUserId) return null;
-
     const { userId } = this.config;
 
     const roomData: Room = {
@@ -74,7 +75,10 @@ class Rooms {
       updatedAt: Date.now(),
     };
 
-    await this.collection().doc(`${userId}-${otherUserId}`).set(roomData);
+    const roomId = generateRoomId(userId, otherUserId);
+    if (!roomId) return null;
+
+    await this.collection().doc(roomId).set(roomData);
 
     return await this.findRoom(otherUserId);
   };
@@ -86,9 +90,11 @@ class Rooms {
   deleteAllRooms = async () => {
     const rooms = await this.getRooms();
 
-    rooms.forEach(
-      async (item) => await this.collection().doc(item.id).delete()
+    const promises = rooms.map((item) =>
+      this.collection().doc(item.id).delete()
     );
+
+    await Promise.all(promises);
   };
 
   listenRooms = (callback: (rooms: Room[]) => void) => {

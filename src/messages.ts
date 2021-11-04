@@ -1,3 +1,4 @@
+import { getUserIdsFromRoomId } from "./utils/room.utils";
 import firebase from "firebase";
 import {
   GetMessagesOptions,
@@ -29,7 +30,10 @@ class Messages {
     return this.collection().where("roomId", "==", this.config.roomId);
   };
 
-  sendMessage = async (message: string, mediaURL?: string) => {
+  sendMessage = async (
+    message: string,
+    mediaURL?: string
+  ): Promise<Message | null> => {
     if (!message && !mediaURL) {
       console.warn(
         "Message could not sent. `message` and `mediaURL` did not provided for sendMessage(message: string, mediaURL?: string)"
@@ -58,7 +62,7 @@ class Messages {
 
     await this.collection("rooms").doc(roomId).update(roomData);
 
-    return { id: data.id, ...data.data() };
+    return { id: data.id, ...(data.data() as Message) };
   };
 
   getMessages = async (
@@ -92,9 +96,10 @@ class Messages {
     const { roomId } = this.config;
     const data = await this.collection().where("roomId", "==", roomId).get();
 
-    data.docs.forEach(
-      async (item) => await this.collection().doc(item.id).delete()
+    const promises = data.docs.map((item) =>
+      this.collection().doc(item.id).delete()
     );
+    await Promise.all(promises);
   };
 
   onReadMessage = async (messageId: string) => {
@@ -141,15 +146,13 @@ class Messages {
   };
 
   getOtherUserId = () => {
-    const splittedRoomId = this.config.roomId.split("-");
-    if (splittedRoomId.length !== 2) {
+    const userIds = getUserIdsFromRoomId(this.config.roomId);
+    if (!userIds) {
       throw new Error(
         `Invalid roomId format provided in Messages '${this.config.roomId}'`
       );
     }
-    return splittedRoomId[0] === this.config.userId
-      ? splittedRoomId[1]
-      : splittedRoomId[0];
+    return userIds[0] === this.config.userId ? userIds[1] : userIds[0];
   };
 }
 
