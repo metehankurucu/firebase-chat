@@ -1,5 +1,5 @@
-import { Message } from "./messages";
-import { FirebaseChatOptions } from "./options";
+import { Message } from './messages';
+import { FirebaseChatOptions } from './options';
 
 export interface RoomsConfig extends FirebaseChatOptions {
   userId: string;

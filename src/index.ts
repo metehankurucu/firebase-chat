@@ -1,11 +1,11 @@
-import firebase from "firebase";
-import Rooms from "./rooms";
-import Messages from "./messages";
-import { FirebaseChatOptions } from "./interfaces/options";
+import firebase from 'firebase';
+import Rooms from './rooms';
+import Messages from './messages';
+import { FirebaseChatOptions } from './interfaces/options';
 
 const defaultOptions: FirebaseChatOptions = {
-  collectionPrefix: "chat",
-  databaseType: "firestore",
+  collectionPrefix: 'chat',
+  databaseType: 'firestore',
 };
 
 class FirebaseChat {
@@ -15,11 +15,11 @@ class FirebaseChat {
 
   static initialize = (
     options: Partial<FirebaseChatOptions> = {},
-    firebaseConfig?: object | undefined
+    firebaseConfig?: object | undefined,
   ) => {
     if (FirebaseChat.options)
       throw new Error(
-        "FirebaseChat initialized before. You must not call FirebaseChat.initialize more than once."
+        'FirebaseChat initialized before. You must not call FirebaseChat.initialize more than once.',
       );
 
     if (firebaseConfig) firebase.initializeApp(firebaseConfig);
@@ -30,7 +30,7 @@ class FirebaseChat {
   static setUser = (userId: string) => {
     if (!FirebaseChat.options)
       throw new Error(
-        "options not found, please first initialize with FirebaseChat.initialize()."
+        'options not found, please first initialize with FirebaseChat.initialize().',
       );
 
     FirebaseChat.userId = userId;
@@ -41,12 +41,12 @@ class FirebaseChat {
   static messages = (roomId: string) => {
     if (!FirebaseChat.options)
       throw new Error(
-        "options not found, please first initialize with FirebaseChat.initialize()."
+        'options not found, please first initialize with FirebaseChat.initialize().',
       );
 
     if (!FirebaseChat.userId)
       throw new Error(
-        "userId not found, please set userId with FirebaseChat.setUser(userId)."
+        'userId not found, please set userId with FirebaseChat.setUser(userId).',
       );
 
     return new Messages({
@@ -59,12 +59,12 @@ class FirebaseChat {
   static rooms = () => {
     if (!FirebaseChat.options || !FirebaseChat._rooms)
       throw new Error(
-        "options not found, please first initialize with FirebaseChat.initialize()."
+        'options not found, please first initialize with FirebaseChat.initialize().',
       );
 
     if (!FirebaseChat.userId || !FirebaseChat._rooms)
       throw new Error(
-        "userId not found, please set userId with FirebaseChat.setUser(userId)."
+        'userId not found, please set userId with FirebaseChat.setUser(userId).',
       );
 
     return FirebaseChat._rooms;

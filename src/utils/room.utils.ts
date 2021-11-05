@@ -1,4 +1,4 @@
-const separator = "-FC-";
+const separator = '-FC-';
 
 export const generateRoomId = (user1Id: string, user2Id: string) => {
   if (!user1Id || !user2Id) return null;

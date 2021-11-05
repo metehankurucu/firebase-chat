@@ -1,4 +1,4 @@
 export interface FirebaseChatOptions {
   collectionPrefix: string;
-  databaseType?: "firestore";
+  databaseType?: 'firestore';
 }

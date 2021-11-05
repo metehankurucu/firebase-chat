@@ -1,11 +1,11 @@
-import { getUserIdsFromRoomId } from "./utils/room.utils";
-import firebase from "firebase";
+import { getUserIdsFromRoomId } from './utils/room.utils';
+import firebase from 'firebase';
 import {
   GetMessagesOptions,
   Message,
   MessagesConfig,
-} from "./interfaces/messages";
-import { Room } from "./interfaces/rooms";
+} from './interfaces/messages';
+import { Room } from './interfaces/rooms';
 
 const defaultGetMessagesOptions: GetMessagesOptions = {
   limit: 100,
@@ -22,21 +22,21 @@ class Messages {
     this.otherUserId = this.getOtherUserId();
   }
 
-  collection = (collection = "messages") => {
+  collection = (collection = 'messages') => {
     return this.db.collection(`${this.config.collectionPrefix}${collection}`);
   };
 
   docs = () => {
-    return this.collection().where("roomId", "==", this.config.roomId);
+    return this.collection().where('roomId', '==', this.config.roomId);
   };
 
   sendMessage = async (
     message: string,
-    mediaURL?: string
+    mediaURL?: string,
   ): Promise<Message | null> => {
     if (!message && !mediaURL) {
       console.warn(
-        "Message could not sent. `message` and `mediaURL` did not provided for sendMessage(message: string, mediaURL?: string)"
+        'Message could not sent. `message` and `mediaURL` did not provided for sendMessage(message: string, mediaURL?: string)',
       );
       return null;
     }
@@ -60,21 +60,21 @@ class Messages {
       updatedAt: Date.now(),
     };
 
-    await this.collection("rooms").doc(roomId).update(roomData);
+    await this.collection('rooms').doc(roomId).update(roomData);
 
     return { id: data.id, ...(data.data() as Message) };
   };
 
   getMessages = async (
-    options?: Partial<GetMessagesOptions>
+    options?: Partial<GetMessagesOptions>,
   ): Promise<Message[]> => {
     const config = { ...defaultGetMessagesOptions, ...(options ?? {}) };
     const { roomId } = this.config;
     const messages: Message[] = [];
 
     let query = this.collection()
-      .where("roomId", "==", roomId)
-      .orderBy("date", "desc");
+      .where('roomId', '==', roomId)
+      .orderBy('date', 'desc');
 
     if (config.startAfter) query = query.startAfter(config.startAfter);
 
@@ -83,7 +83,7 @@ class Messages {
     const data = await query.get();
 
     data.forEach((item) =>
-      messages.push({ id: item.id, ...(item.data() as Message) })
+      messages.push({ id: item.id, ...(item.data() as Message) }),
     );
     return messages;
   };
@@ -94,10 +94,10 @@ class Messages {
 
   deleteAllMessages = async () => {
     const { roomId } = this.config;
-    const data = await this.collection().where("roomId", "==", roomId).get();
+    const data = await this.collection().where('roomId', '==', roomId).get();
 
     const promises = data.docs.map((item) =>
-      this.collection().doc(item.id).delete()
+      this.collection().doc(item.id).delete(),
     );
     await Promise.all(promises);
   };
@@ -109,13 +109,13 @@ class Messages {
   onReadAllMessages = async () => {
     const { roomId, userId } = this.config;
     const data = await this.collection()
-      .where("roomId", "==", roomId)
-      .where("read", "==", false)
-      .where("senderId", "!=", userId)
+      .where('roomId', '==', roomId)
+      .where('read', '==', false)
+      .where('senderId', '!=', userId)
       .get();
 
     const promises = data.docs.map((item) =>
-      this.collection().doc(item.id).update({ read: true })
+      this.collection().doc(item.id).update({ read: true }),
     );
 
     await Promise.all(promises);
@@ -123,14 +123,14 @@ class Messages {
 
   listenMessages = (
     options: Partial<GetMessagesOptions>,
-    callback: (messages: Message[]) => void
+    callback: (messages: Message[]) => void,
   ) => {
     const config = { ...defaultGetMessagesOptions, ...(options ?? {}) };
     const { roomId } = this.config;
 
     let query = this.collection()
-      .where("roomId", "==", roomId)
-      .orderBy("date", "desc");
+      .where('roomId', '==', roomId)
+      .orderBy('date', 'desc');
 
     if (config.startAfter) query = query.startAfter(config.startAfter);
 
@@ -139,7 +139,7 @@ class Messages {
     return query.onSnapshot((snapshot) => {
       const items: Message[] = [];
       snapshot.forEach((item) =>
-        items.push({ id: item.id, ...(item.data() as Message) })
+        items.push({ id: item.id, ...(item.data() as Message) }),
       );
       callback(items);
     });
@@ -149,7 +149,7 @@ class Messages {
     const userIds = getUserIdsFromRoomId(this.config.roomId);
     if (!userIds) {
       throw new Error(
-        `Invalid roomId format provided in Messages '${this.config.roomId}'`
+        `Invalid roomId format provided in Messages '${this.config.roomId}'`,
       );
     }
     return userIds[0] === this.config.userId ? userIds[1] : userIds[0];
