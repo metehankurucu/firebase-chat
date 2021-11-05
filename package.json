@@ -1,6 +1,6 @@
 {
   "name": "@metehankurucu/firebase-chat",
-  "version": "0.2.2",
+  "version": "0.3.0",
   "description": "A small library for one-to-one messaging with Firebase.",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
