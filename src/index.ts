@@ -12,18 +12,20 @@ class FirebaseChat {
   private static _rooms: Rooms;
   static userId: string;
   static options: FirebaseChatOptions;
+  static isInitialized = false;
 
   static initialize = (
     options: Partial<FirebaseChatOptions> = {},
     firebaseConfig?: object | undefined,
   ) => {
     if (FirebaseChat.options)
-      throw new Error(
+      console.warn(
         'FirebaseChat initialized before. You must not call FirebaseChat.initialize more than once.',
       );
 
     if (firebaseConfig) firebase.initializeApp(firebaseConfig);
     FirebaseChat.options = { ...defaultOptions, ...options };
+    FirebaseChat.isInitialized = true;
     return FirebaseChat;
   };
 
