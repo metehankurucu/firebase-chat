@@ -1,8 +1,10 @@
 import { Message } from './messages';
 import { FirebaseChatOptions } from './options';
+import firebase from 'firebase';
 
 export interface RoomsConfig extends FirebaseChatOptions {
   userId: string;
+  firestore?: firebase.firestore.Firestore;
 }
 
 export interface Room {

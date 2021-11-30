@@ -8,7 +8,7 @@ class Rooms {
 
   constructor(config: RoomsConfig) {
     this.config = config;
-    this.db = firebase.firestore();
+    this.db = config.firestore || firebase.firestore();
   }
 
   collection = () => {

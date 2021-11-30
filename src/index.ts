@@ -13,10 +13,12 @@ class FirebaseChat {
   static userId: string;
   static options: FirebaseChatOptions;
   static isInitialized = false;
+  static firestore: firebase.firestore.Firestore | undefined;
 
   static initialize = (
     options: Partial<FirebaseChatOptions> = {},
     firebaseConfig?: object | undefined,
+    firestore?: firebase.firestore.Firestore,
   ) => {
     if (FirebaseChat.options)
       console.warn(
@@ -26,6 +28,7 @@ class FirebaseChat {
     if (firebaseConfig) firebase.initializeApp(firebaseConfig);
     FirebaseChat.options = { ...defaultOptions, ...options };
     FirebaseChat.isInitialized = true;
+    FirebaseChat.firestore = firestore;
     return FirebaseChat;
   };
 

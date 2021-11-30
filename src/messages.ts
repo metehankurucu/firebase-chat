@@ -18,7 +18,7 @@ class Messages {
 
   constructor(config: MessagesConfig) {
     this.config = config;
-    this.db = firebase.firestore();
+    this.db = config.firestore || firebase.firestore();
     this.otherUserId = this.getOtherUserId();
   }
 
