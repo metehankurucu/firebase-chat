@@ -39,7 +39,11 @@ class FirebaseChat {
       );
 
     FirebaseChat.userId = userId;
-    FirebaseChat._rooms = new Rooms({ userId, ...FirebaseChat.options });
+    FirebaseChat._rooms = new Rooms({
+      userId,
+      ...FirebaseChat.options,
+      firestore: FirebaseChat.firestore,
+    });
     return FirebaseChat;
   };
 
@@ -58,6 +62,7 @@ class FirebaseChat {
       roomId,
       userId: FirebaseChat.userId,
       ...FirebaseChat.options,
+      firestore: FirebaseChat.firestore,
     });
   };
 
