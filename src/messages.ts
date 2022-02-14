@@ -1,5 +1,5 @@
-import { getUserIdsFromRoomId } from './utils/room.utils';
 import firebase from 'firebase';
+import { getUserIdsFromRoomId } from './utils/room.utils';
 import {
   GetMessagesOptions,
   Message,

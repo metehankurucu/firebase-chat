@@ -1,5 +1,5 @@
-import { FirebaseChatOptions } from './options';
 import firebase from 'firebase';
+import { FirebaseChatOptions } from './options';
 
 export interface Message {
   id?: string;

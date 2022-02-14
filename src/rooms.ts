@@ -1,5 +1,5 @@
-import { generateRoomId } from './utils/room.utils';
 import firebase from 'firebase';
+import { generateRoomId } from './utils/room.utils';
 import { Room, RoomsConfig, GetRoomOptions } from './interfaces/rooms';
 
 class Rooms {
