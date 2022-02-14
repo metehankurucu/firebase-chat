@@ -17,6 +17,7 @@
     <a>
       <img src="https://img.shields.io/npm/l/@metehankurucu/firebase-chat" alt="license" />
     </a>
+    <img src="https://badgen.net/badge/-/TypeScript/blue?icon=typescript&label" alt="typescript" />
     <br />
     <br />
     <h3>
@@ -24,48 +25,196 @@
     </h3>
   </sup>
   <br />
-  <pre>npm i @metehankurucu/firebase-chat</pre>
 </div>
 
-## This package under development
+<!-- # `@metehankurucu/firebase-chat` -->
+
+- [Install](#getting-started)
+- [Usage](#usage)
+- [API](#api)
+
+## Getting started
+
+Install the library:
+
+```
+yarn add @metehankurucu/firebase-chat
+```
+
+or npm:
+
+```
+npm install --save @metehankurucu/firebase-chat
+```
 
 ## Usage
 
+#### Step 1 - Initialize FirebaseChat
+
 ```js
-// required step 1
-FirebaseChat.initialize(
-  // FirebaseChat options (optional)
-  {},
-  // this is optional if you did'nt initialize firebase yet
-  {
-    apiKey: "",
-    authDomain: "",
-    projectId: "",
-    storageBucket: "",
-    messagingSenderId: "",
-    appId: "",
-  }
-);
+import FirebaseChat from '@metehankurucu/firebase-chat';
 
-// required step 2
-// set current userId
-FirebaseChat.setUser("user1");
+// Optional. Use if firebase not initialized before
+const firebaseConfig = {
+  apiKey: '',
+  authDomain: '',
+  projectId: '',
+  storageBucket: '',
+  messagingSenderId: '',
+  appId: '',
+  measurementId: '',
+};
 
-// example usage
+const options = {
+  collectionPrefix: 'chat', // optional. collection names will be 'chatmessages' and 'chatrooms'
+};
 
-const rooms = FirebaseChat.rooms();
+FirebaseChat.initialize({}, firebaseConfig);
 
-// create room for current user and other user (user2)
-await rooms.createRoom("user2");
+// Or set collection prefixes
+FirebaseChat.initialize(options, firebaseConfig);
 
-// get current user and other user's room by pass other user ıd
-const myRoom = await rooms.getRoom("user2");
+// Or give custom firestore instance (for example using library in React Native)
+import firestore from '@react-native-firebase/firestore';
 
-const messages = FirebaseChat.messages(myRoom.id);
-
-// send message to room by current user
-const message = await messages.sendMessage("hi");
-
-// get messages from current user and other user's room
-const roomMessages = await messages.getMessages();
+FirebaseChat.initialize({}, firebaseConfig, firestore());
 ```
+
+FirebaseChat must initialize only one time. You can check if it is initialized.
+
+```js
+if (!FirebaseChat.isInitialized) {
+  FirebaseChat.initialize({}, firebaseConfig);
+}
+```
+
+#### Step 2 - Set Current User Id
+
+```js
+import FirebaseChat from '@metehankurucu/firebase-chat';
+
+FirebaseChat.setUser(userId);
+
+// Or you can combine two steps
+FirebaseChat.initialize({}, firebaseConfig).setUser(userId);
+```
+
+#### Rooms
+
+```js
+const rooms = FirebaseChat.rooms();
+```
+
+Listen current user's rooms
+
+```js
+const unsubscribe = rooms.listenRooms(async (items) => {
+  // Do some stuff
+});
+```
+
+Get a room
+
+```js
+// Get a room with other user id
+const room = rooms.getRoom(otherUserId);
+// Or room can create if not exists
+const room = rooms.getRoom(otherUserId, { createIfNotExists: true });
+```
+
+Delete a room
+
+```js
+rooms.deleteRoom(room.id);
+```
+
+Create a room
+
+```js
+rooms.createRoom(otherUserId);
+```
+
+Note: Recommended way to create a room using getRoom with createIfNotExists option.
+
+```js
+const room = rooms.getRoom(otherUserId, { createIfNotExists: true });
+```
+
+Get collection. If you want to use collection to run custom operations.
+
+```js
+// Firestore collection instance
+const roomsCollection = rooms.collection();
+```
+
+#### Messages
+
+```js
+const room = await rooms.getRoom(otherUserId, { createIfNotExists: true });
+
+const messages = FirebaseChat.messages(room.id);
+```
+
+Send message
+
+```js
+const message = messages.sendMessage('Hey!');
+// Optional mediaURL
+const message = messages.sendMessage('Did you see this meme?', 'pic-url');
+```
+
+Note: Sending message will update current room's `lastMessage` field.
+
+Listen this room's messages
+
+```js
+// For example listen messages with first get last 50 messages
+const unsubscribe = messages.listenMessages({ limit: 50 }, (items) => {});
+```
+
+Get this room's messages
+
+```js
+const messagesList = await messages.getMessages({ limit: 50 });
+```
+
+Get other user id
+
+```js
+const otherUserId = messages.getOtherUserId();
+```
+
+On read a message. This will update this message's `read` field as `true`.
+
+```js
+await messages.onReadMessage(messageId);
+```
+
+On read all messages. This will update all messages sent by other user `read` field as `true`.
+
+```js
+await messages.onReadAllMessages();
+```
+
+Delete a message
+
+```js
+await messages.deleteMessage(messageId);
+```
+
+Delete all messages of room
+
+```js
+await messages.deleteMessage(messageId);
+```
+
+Get collection. If you want to use collection to run custom operations.
+
+```js
+// Firestore collection instance
+const messagesCollection = messages.collection();
+```
+
+## API
+
+TODO
