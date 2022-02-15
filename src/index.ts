@@ -35,27 +35,23 @@ class FirebaseChat {
   static setUser = (userId: string) => {
     if (!FirebaseChat.options)
       throw new Error(
-        'options not found, please first initialize with FirebaseChat.initialize().',
+        'options not found, please first initialize with FirebaseChat.initialize() before calling FirebaseChat.setUser',
       );
 
     FirebaseChat.userId = userId;
-    FirebaseChat._rooms = new Rooms({
-      userId,
-      ...FirebaseChat.options,
-      firestore: FirebaseChat.firestore,
-    });
+
     return FirebaseChat;
   };
 
   static messages = (roomId: string) => {
     if (!FirebaseChat.options)
       throw new Error(
-        'options not found, please first initialize with FirebaseChat.initialize().',
+        'options not found, please first initialize with FirebaseChat.initialize() before calling FirebaseChat.messages',
       );
 
     if (!FirebaseChat.userId)
       throw new Error(
-        'userId not found, please set userId with FirebaseChat.setUser(userId).',
+        'userId not found, please set userId with FirebaseChat.setUser(userId) before calling FirebaseChat.messages',
       );
 
     return new Messages({
@@ -67,15 +63,23 @@ class FirebaseChat {
   };
 
   static rooms = () => {
-    if (!FirebaseChat.options || !FirebaseChat._rooms)
+    if (!FirebaseChat.options)
       throw new Error(
-        'options not found, please first initialize with FirebaseChat.initialize().',
+        'options not found, please first initialize with FirebaseChat.initialize() before calling FirebaseChat.rooms',
       );
 
-    if (!FirebaseChat.userId || !FirebaseChat._rooms)
+    if (!FirebaseChat.userId)
       throw new Error(
-        'userId not found, please set userId with FirebaseChat.setUser(userId).',
+        'userId not found, please set userId with FirebaseChat.setUser(userId) before calling FirebaseChat.rooms',
       );
+
+    if (!FirebaseChat._rooms) {
+      FirebaseChat._rooms = new Rooms({
+        userId: FirebaseChat.userId,
+        ...FirebaseChat.options,
+        firestore: FirebaseChat.firestore,
+      });
+    }
 
     return FirebaseChat._rooms;
   };
